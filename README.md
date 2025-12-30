@@ -1,6 +1,6 @@
 # Ubuntu Akash SSH
 
-基于 [Akash Network Ubuntu SSH](https://github.com/akash-network/ubuntu-ssh) 的增强版 Docker 镜像，集成了开发常用工具和 Cron 任务调度功能。
+基于 [Akash Network Ubuntu SSH](ghcr.io/akash-network/ubuntu-2404-ssh:2) 的增强版 Docker 镜像，集成了开发常用工具和 Cron 任务调度功能。
 
 ## 特性
 
@@ -241,18 +241,10 @@ A: 使用 docker logs 命令：
 docker logs akash-ssh
 ```
 
-## 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## 许可证
-
-本项目继承基础镜像的许可证。具体请参考 [Akash Network Ubuntu SSH](https://github.com/akash-network/ubuntu-ssh) 项目。
 
 ## 相关链接
 
 - [Akash Network](https://akash.network/)
-- [Akash Ubuntu SSH 基础镜像](https://github.com/akash-network/ubuntu-ssh)
 - [UV - Python 包管理器](https://github.com/astral-sh/uv)
 - [GitHub Container Registry](https://github.com/features/packages)
 
