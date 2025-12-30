@@ -1,6 +1,6 @@
 # Ubuntu Akash SSH
 
-基于 [Akash Network Ubuntu SSH](ghcr.io/akash-network/ubuntu-2404-ssh:2) 的增强版 Docker 镜像，集成了开发常用工具和 Cron 任务调度功能。
+基于 [Akash Network](https://github.com/akash-network) 的 Ubuntu SSH 镜像 (`ghcr.io/akash-network/ubuntu-2404-ssh:2`) 增强版本，集成了开发常用工具和 Cron 任务调度功能。
 
 ## 特性
 
@@ -15,10 +15,21 @@
 
 ## 快速开始
 
+### 0. 获取镜像
+
+本项目镜像托管在 GitHub Container Registry，每次推送到 `main` 分支时会自动构建并发布。
+
+您可以从以下位置获取构建产物：
+
+- **GitHub Packages**: https://github.com/zhajingwen/ubuntu-akash-ssh/pkgs/container/ubuntu-akash-ssh
+- **镜像地址**: `ghcr.io/zhajingwen/ubuntu-akash-ssh:latest`
+
+可用的标签包括 `latest`、`main`、版本号等（详见[镜像标签策略](#镜像标签策略)）。
+
 ### 1. 拉取镜像
 
 ```bash
-docker pull ghcr.io/YOUR_USERNAME/ubuntu-akash-ssh:latest
+docker pull ghcr.io/zhajingwen/ubuntu-akash-ssh:latest
 ```
 
 ### 2. 运行容器
@@ -28,7 +39,7 @@ docker run -d \
   --name akash-ssh \
   -p 2222:22 \
   -e SSH_PUBKEY="$(cat ~/.ssh/id_rsa.pub)" \
-  ghcr.io/YOUR_USERNAME/ubuntu-akash-ssh:latest
+  ghcr.io/zhajingwen/ubuntu-akash-ssh:latest
 ```
 
 ### 3. 连接到容器
@@ -86,7 +97,7 @@ docker run -d \
   -p 2222:22 \
   -v /path/to/data:/data \
   -e SSH_PUBKEY="$(cat ~/.ssh/id_rsa.pub)" \
-  ghcr.io/YOUR_USERNAME/ubuntu-akash-ssh:latest
+  ghcr.io/zhajingwen/ubuntu-akash-ssh:latest
 ```
 
 ## 构建与部署
@@ -95,7 +106,7 @@ docker run -d \
 
 ```bash
 # 克隆仓库
-git clone https://github.com/YOUR_USERNAME/ubuntu-akash-ssh.git
+git clone https://github.com/zhajingwen/ubuntu-akash-ssh.git
 cd ubuntu-akash-ssh
 
 # 构建镜像
@@ -114,7 +125,7 @@ docker buildx create --use
 # 构建并推送多架构镜像
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t ghcr.io/YOUR_USERNAME/ubuntu-akash-ssh:latest \
+  -t ghcr.io/zhajingwen/ubuntu-akash-ssh:latest \
   --push .
 ```
 
@@ -127,9 +138,9 @@ version: "2.0"
 
 services:
   ssh:
-    image: ghcr.io/YOUR_USERNAME/ubuntu-akash-ssh:latest
+    image: ghcr.io/zhajingwen/ubuntu-akash-ssh:latest
     env:
-      - SSH_PUBKEY=YOUR_SSH_PUBLIC_KEY
+      - SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2E...  # 替换为您的 SSH 公钥
     expose:
       - port: 22
         as: 22
@@ -163,8 +174,10 @@ deployment:
 2. **部署到 Akash**:
 
 ```bash
-akash tx deployment create deploy.yaml --from YOUR_WALLET
+akash tx deployment create deploy.yaml --from <your-wallet-name>
 ```
+
+> 将 `<your-wallet-name>` 替换为您的 Akash 钱包名称
 
 ## 自动化构建
 
@@ -222,7 +235,7 @@ akash tx deployment create deploy.yaml --from YOUR_WALLET
 A: 通过环境变量 `TZ` 设置：
 
 ```bash
-docker run -d -e TZ=Asia/Shanghai -e SSH_PUBKEY="..." ghcr.io/YOUR_USERNAME/ubuntu-akash-ssh:latest
+docker run -d -e TZ=Asia/Shanghai -e SSH_PUBKEY="..." ghcr.io/zhajingwen/ubuntu-akash-ssh:latest
 ```
 
 ### Q: Cron 任务没有执行？
@@ -242,11 +255,30 @@ docker logs akash-ssh
 ```
 
 
+## 贡献
+
+欢迎提交 Issue 和 Pull Request 来改进这个项目！
+
+如果您发现任何问题或有改进建议，请：
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+## 许可证
+
+本项目继承基础镜像的许可证。详情请参考 [Akash Network](https://github.com/akash-network) 相关项目。
+
 ## 相关链接
 
-- [Akash Network](https://akash.network/)
+- [GitHub 仓库](https://github.com/zhajingwen/ubuntu-akash-ssh)
+- [GitHub Packages - 镜像下载](https://github.com/zhajingwen/ubuntu-akash-ssh/pkgs/container/ubuntu-akash-ssh)
+- [Akash Network 官网](https://akash.network/)
+- [Akash Network GitHub](https://github.com/akash-network)
 - [UV - Python 包管理器](https://github.com/astral-sh/uv)
-- [GitHub Container Registry](https://github.com/features/packages)
+- [GitHub Container Registry 文档](https://docs.github.com/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 
 ## 更新日志
 
@@ -257,7 +289,3 @@ docker logs akash-ssh
 - ✅ 集成 vim 和 cron 支持
 - ✅ 配置自动化 CI/CD 流程
 - ✅ 支持多架构构建 (amd64/arm64)
-
----
-
-**注意**: 请将 `YOUR_USERNAME` 替换为您的 GitHub 用户名或组织名。
