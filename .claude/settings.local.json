@@ -11,7 +11,8 @@
       "Bash(docker build:*)",
       "Bash(ubuntu-akash-ssh-cron)",
       "Bash(docker logs:*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(docker history:*)"
     ]
   }
 }
