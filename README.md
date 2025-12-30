@@ -23,6 +23,7 @@
 
 - **GitHub Packages**: https://github.com/zhajingwen/ubuntu-akash-ssh/pkgs/container/ubuntu-akash-ssh
 - **镜像地址**: `ghcr.io/zhajingwen/ubuntu-akash-ssh:latest`
+- **镜像大小**: 约 300MB (基础镜像 127MB + 增强工具 173MB)
 
 可用的标签包括 `latest`、`main`、版本号等（详见[镜像标签策略](#镜像标签策略)）。
 
@@ -227,6 +228,11 @@ akash tx deployment create deploy.yaml --from <your-wallet-name>
 - 清理 apt 缓存和临时文件
 - 使用 `--no-install-recommends` 减少不必要的依赖
 - 最小化安装包列表
+
+**镜像大小对比**:
+- 基础镜像 (`ghcr.io/akash-network/ubuntu-2404-ssh:2`): 127MB
+- 最终镜像 (添加 vim、cron、git、curl、uv): 约 300MB
+- 新增工具占用: 约 173MB
 
 ## 常见问题
 
