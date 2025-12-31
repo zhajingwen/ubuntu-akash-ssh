@@ -1,7 +1,3 @@
-# 指定平台以避免警告（可选，推荐在多架构环境中使用）
-# 取消注释下一行以强制使用 ARM64 架构
-# FROM --platform=linux/arm64 ghcr.io/akash-network/ubuntu-2404-ssh:2
-# 或使用默认架构（当前为 AMD64）
 FROM ghcr.io/akash-network/ubuntu-2404-ssh:2
 
 # 构建参数

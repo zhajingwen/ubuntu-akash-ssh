@@ -15,11 +15,21 @@ else
   echo "$(date): SSH_PUBKEY (${pubkey_preview}) written to ~/.ssh/authorized_keys"
 fi
 
-# 加载 crontab 配置
+# 加载 crontab 配置并替换环境变量
 if [ -f /root/crontab.txt ]; then
   echo "$(date): Loading crontab configuration..."
-  crontab /root/crontab.txt
-  echo "$(date): Crontab loaded successfully"
+
+  # 创建临时文件并替换环境变量
+  TEMP_CRONTAB=$(mktemp)
+
+  # 替换 LARKBOT_ID 环境变量（使用实际值）
+  sed "s|\${LARKBOT_ID}|${LARKBOT_ID}|g" /root/crontab.txt > "$TEMP_CRONTAB"
+
+  # 加载处理后的 crontab
+  crontab "$TEMP_CRONTAB"
+  rm -f "$TEMP_CRONTAB"
+
+  echo "$(date): Crontab loaded successfully with LARKBOT_ID=${LARKBOT_ID}"
 fi
 
 # 启动 cron 服务
