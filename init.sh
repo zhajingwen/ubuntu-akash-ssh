@@ -15,6 +15,13 @@ else
   echo "$(date): SSH_PUBKEY (${pubkey_preview}) written to ~/.ssh/authorized_keys"
 fi
 
+# 加载 crontab 配置
+if [ -f /root/crontab.txt ]; then
+  echo "$(date): Loading crontab configuration..."
+  crontab /root/crontab.txt
+  echo "$(date): Crontab loaded successfully"
+fi
+
 # 启动 cron 服务
 echo "$(date): Starting cron service..."
 service cron start
@@ -22,6 +29,9 @@ service cron start
 # 检查 cron 服务状态
 if service cron status > /dev/null 2>&1; then
   echo "$(date): Cron service started successfully"
+  # 显示当前 crontab 配置
+  echo "$(date): Current crontab entries:"
+  crontab -l 2>/dev/null || echo "  (no crontab entries)"
 else
   echo "$(date): Warning: Cron service may not have started properly"
 fi

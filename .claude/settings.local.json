@@ -1,18 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cat:*)",
-      "Bash(docker pull:*)",
-      "Bash(docker inspect:*)",
-      "Bash(docker run:*)",
-      "Bash(docker stop:*)",
-      "Bash(docker rm:*)",
-      "Bash(docker rmi:*)",
-      "Bash(docker build:*)",
-      "Bash(ubuntu-akash-ssh-cron)",
-      "Bash(docker logs:*)",
-      "Bash(docker exec:*)",
-      "Bash(docker history:*)"
+      "Bash(git restore:*)",
+      "Bash(docker images:*)"
     ]
   }
 }

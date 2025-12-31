@@ -10,8 +10,10 @@
 - 📦 **Python 工具**: 集成 [uv](https://github.com/astral-sh/uv) 快速 Python 包管理器
 - 🔐 **SSH 访问**: 支持通过环境变量配置 SSH 公钥
 - 🌏 **时区配置**: 默认时区 Asia/Bangkok (可自定义)
+- 🌐 **国际化支持**: UTF-8 Locale 支持 (en_US.UTF-8, zh_CN.UTF-8)
 - 🏗️ **多架构支持**: 支持 amd64 和 arm64 架构
 - 🤖 **自动构建**: GitHub Actions 自动构建和发布
+- 📊 **预置项目**: 内置 hyperliquid-btc-lag-tracker 项目，每2小时自动执行分析任务
 
 ## 快速开始
 
@@ -23,7 +25,7 @@
 
 - **GitHub Packages**: https://github.com/zhajingwen/ubuntu-akash-ssh/pkgs/container/ubuntu-akash-ssh
 - **镜像地址**: `ghcr.io/zhajingwen/ubuntu-akash-ssh:latest`
-- **镜像大小**: 约 300MB (基础镜像 127MB + 增强工具 173MB)
+- **镜像大小**: 约 300MB (已优化，删除 .git 目录节省 ~15MB)
 
 可用的标签包括 `latest`、`main`、版本号等（详见[镜像标签策略](#镜像标签策略)）。
 
@@ -55,6 +57,7 @@ ssh -p 2222 root@localhost
 |--------|------|----------|--------|
 | `SSH_PUBKEY` | SSH 公钥内容 | 推荐 | - |
 | `TZ` | 时区设置 | 否 | `Asia/Bangkok` |
+| `LARKBOT_ID` | Lark Bot ID（可选，默认已配置） | 否 | `e15eaffe-05db-48f2-8059-a78b1beff8c9` |
 
 ## 预装工具
 
@@ -63,7 +66,34 @@ ssh -p 2222 root@localhost
 - **git**: 版本控制工具
 - **curl**: 数据传输工具
 - **ca-certificates**: SSL 证书
+- **locales**: 国际化和 UTF-8 支持（支持中文等多语言）
 - **uv**: 高性能 Python 包管理器
+
+## 预置项目
+
+### Hyperliquid BTC Lag Tracker
+
+镜像已内置 [hyperliquid-btc-lag-tracker](https://github.com/zhajingwen/hyperliquid-btc-lag-tracker-) 项目，位于 `/root/hyperliquid-btc-lag-tracker-` 目录。
+
+**自动任务**:
+- 每2小时自动执行分析脚本
+- 分析日志保存在 `/root/hyperliquid-btc-lag-tracker-/hyperliquid.log`
+- 环境变量 `LARKBOT_ID` 已配置为 `e15eaffe-05db-48f2-8059-a78b1beff8c9`
+
+**查看日志**:
+```bash
+# 连接到容器后查看日志
+tail -f /root/hyperliquid-btc-lag-tracker-/hyperliquid.log
+
+# 或使用 docker exec
+docker exec -it akash-ssh tail -f /root/hyperliquid-btc-lag-tracker-/hyperliquid.log
+```
+
+**手动运行**:
+```bash
+cd /root/hyperliquid-btc-lag-tracker-
+uv run hyperliquid_analyzer.py
+```
 
 ## 使用示例
 
@@ -110,8 +140,14 @@ docker run -d \
 git clone https://github.com/zhajingwen/ubuntu-akash-ssh.git
 cd ubuntu-akash-ssh
 
-# 构建镜像
+# 标准构建
 docker build -t ubuntu-akash-ssh:local .
+
+# 使用自定义参数构建
+docker build \
+  --build-arg LARKBOT_ID="your-larkbot-id" \
+  --build-arg CRON_SCHEDULE="0 */1 * * *" \
+  -t ubuntu-akash-ssh:local .
 
 # 运行
 docker run -d -p 2222:22 -e SSH_PUBKEY="$(cat ~/.ssh/id_rsa.pub)" ubuntu-akash-ssh:local
@@ -218,21 +254,29 @@ akash tx deployment create deploy.yaml --from <your-wallet-name>
 容器启动时，`init.sh` 脚本会执行以下操作：
 
 1. 检查并配置 SSH 公钥 (从 `SSH_PUBKEY` 环境变量)
-2. 启动 cron 服务
-3. 启动 SSH 服务
-4. 保持容器运行
+2. 加载 crontab 配置
+3. 启动 cron 服务
+4. 启动 SSH 服务
+5. 保持容器运行
 
 ### 镜像优化
 
-- 单层构建减少镜像大小
-- 清理 apt 缓存和临时文件
-- 使用 `--no-install-recommends` 减少不必要的依赖
-- 最小化安装包列表
+本项目采用多项优化措施减小镜像体积和提升构建速度：
+
+- ✅ **单层构建**：合并多个 RUN 指令减少镜像层数
+- ✅ **浅克隆**：使用 `git clone --depth 1` 减少下载体积
+- ✅ **删除 .git**：克隆后删除 .git 目录节省约 15MB
+- ✅ **清理缓存**：清理 apt、UV 等所有临时文件和缓存
+- ✅ **精简依赖**：使用 `--no-install-recommends` 减少不必要的依赖
+- ✅ **COPY 优化**：使用 `--chmod` 减少镜像层
+- ✅ **健康检查**：内置健康检查支持容器编排平台
+- ✅ **参数化配置**：支持构建参数自定义配置
 
 **镜像大小对比**:
-- 基础镜像 (`ghcr.io/akash-network/ubuntu-2404-ssh:2`): 127MB
-- 最终镜像 (添加 vim、cron、git、curl、uv): 约 300MB
-- 新增工具占用: 约 173MB
+- 基础镜像: 127MB
+- 优化前: 约 320MB
+- 优化后: 约 300MB (节省 ~20MB)
+- 新增工具: 约 173MB
 
 ## 常见问题
 
@@ -286,12 +330,34 @@ docker logs akash-ssh
 - [UV - Python 包管理器](https://github.com/astral-sh/uv)
 - [GitHub Container Registry 文档](https://docs.github.com/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 
+## 构建参数
+
+Dockerfile 支持以下构建参数（ARG）：
+
+| 参数 | 描述 | 默认值 |
+|------|------|--------|
+| `LARKBOT_ID` | Lark Bot ID | `""` (空，使用默认值) |
+| `REPO_URL` | hyperliquid 项目仓库地址 | `https://github.com/zhajingwen/hyperliquid-btc-lag-tracker-.git` |
+| `CRON_SCHEDULE` | Cron 定时任务时间表 | `0 */2 * * *` (每2小时) |
+
+**使用示例**：
+```bash
+docker build \
+  --build-arg LARKBOT_ID="custom-id" \
+  --build-arg CRON_SCHEDULE="0 */1 * * *" \
+  -t ubuntu-akash-ssh:custom .
+```
+
 ## 更新日志
 
-### 最新更改
+### v1.0.0 (最新)
 
-- ✅ 优化 Dockerfile 镜像大小
-- ✅ 添加必要的构建依赖
-- ✅ 集成 vim 和 cron 支持
+- ✅ 集成 hyperliquid-btc-lag-tracker 项目
+- ✅ 配置自动化定时任务（每2小时执行）
+- ✅ 优化镜像大小（删除 .git，使用浅克隆，节省 ~20MB）
+- ✅ 添加健康检查支持
+- ✅ 支持参数化构建（LARKBOT_ID、CRON_SCHEDULE 等）
+- ✅ 优化 Dockerfile 层数（5层 → 3层）
+- ✅ 集成 vim、cron、git、curl、UV 工具
 - ✅ 配置自动化 CI/CD 流程
 - ✅ 支持多架构构建 (amd64/arm64)
