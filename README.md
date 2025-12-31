@@ -25,7 +25,7 @@
 
 - **GitHub Packages**: https://github.com/zhajingwen/ubuntu-akash-ssh/pkgs/container/ubuntu-akash-ssh
 - **镜像地址**: `ghcr.io/zhajingwen/ubuntu-akash-ssh:latest`
-- **镜像大小**: 约 300MB (已优化，删除 .git 目录节省 ~15MB)
+- **镜像大小**: 约 900MB (包含完整 Python 数据分析依赖)
 
 可用的标签包括 `latest`、`main`、版本号等（详见[镜像标签策略](#镜像标签策略)）。
 
@@ -153,6 +153,21 @@ docker build \
 docker run -d -p 2222:22 -e SSH_PUBKEY="$(cat ~/.ssh/id_rsa.pub)" ubuntu-akash-ssh:local
 ```
 
+### 本地测试
+
+项目提供了完整的测试脚本，可以自动化测试镜像构建和运行。详细说明请参考 [TEST_GUIDE.md](TEST_GUIDE.md)。
+
+```bash
+# 快速测试
+./test-build.sh
+
+# 清理旧镜像后测试
+./test-build.sh --clean
+
+# 使用自定义参数测试
+./test-build.sh --build-arg CRON_SCHEDULE="0 */1 * * *"
+```
+
 ### 多架构构建
 
 ```bash
@@ -220,11 +235,15 @@ akash tx deployment create deploy.yaml --from <your-wallet-name>
 
 项目配置了 GitHub Actions 自动化工作流，当以下事件发生时会自动构建并推送镜像：
 
-- 推送到 `main` 分支
+- 推送到任意分支 (支持所有分支构建)
 - 创建新的 Release
 - 手动触发工作流
 
 生成的镜像会推送到 GitHub Container Registry (ghcr.io)。
+
+**分支策略**：
+- `main` 分支构建会打上 `latest` 标签和版本号标签
+- 其他分支仅构建分支名称标签和 commit SHA 标签
 
 ## 镜像标签策略
 
@@ -240,11 +259,15 @@ akash tx deployment create deploy.yaml --from <your-wallet-name>
 ```
 .
 ├── Dockerfile              # 镜像构建文件
-├── init.sh                # 容器初始化脚本
-├── .github/
-│   └── workflows/
-│       └── docker-image.yml   # CI/CD 自动构建配置
-└── README.md              # 项目说明文档
+├── init.sh                # 容器初始化脚本 (增强版，支持 crontab 自动加载)
+├── .dockerignore          # Docker 构建忽略文件
+├── .gitignore             # Git 忽略文件
+├── CHANGELOG.md           # 更新日志
+├── TEST_GUIDE.md          # 本地构建测试指南
+├── README.md              # 项目说明文档
+└── .github/
+    └── workflows/
+        └── docker-image.yml   # CI/CD 自动构建配置 (支持所有分支)
 ```
 
 ## 技术细节
@@ -275,8 +298,9 @@ akash tx deployment create deploy.yaml --from <your-wallet-name>
 **镜像大小对比**:
 - 基础镜像: 127MB
 - 优化前: 约 320MB
-- 优化后: 约 300MB (节省 ~20MB)
-- 新增工具: 约 173MB
+- 优化后: 约 900MB (包含完整 Python 数据分析依赖)
+- hyperliquid 项目及 Python 依赖: 约 476MB
+- 其他工具: 约 297MB
 
 ## 常见问题
 
