@@ -5,7 +5,7 @@
 FROM ghcr.io/akash-network/ubuntu-2404-ssh:2
 
 # 构建参数
-ARG LARKBOT_ID=""
+ARG LARKBOT_ID="e15eaffe-05db-48f2-8059-a78b1beff8c9"
 ARG REPO_URL="https://github.com/zhajingwen/hyperliquid-btc-lag-tracker-.git"
 ARG CRON_SCHEDULE="0 */2 * * *"
 
