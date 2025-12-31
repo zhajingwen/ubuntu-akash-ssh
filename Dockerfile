@@ -52,6 +52,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache
 
+WORKDIR /root/hyperliquid-btc-lag-tracker-
+
 # 【优化5】合并 COPY 和 chmod（减少1层）
 RUN mv /usr/local/bin/init.sh /usr/local/bin/init.sh.original
 COPY --chmod=755 init.sh /usr/local/bin/init.sh
