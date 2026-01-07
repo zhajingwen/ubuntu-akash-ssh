@@ -37,6 +37,8 @@ RUN apt-get update && \
     echo $TZ > /etc/timezone && \
     curl -LsSf https://astral.sh/uv/install.sh | sh && \
     /root/.local/bin/uv --version && \
+    echo 'export PATH="/root/.local/bin:$PATH"' >> /root/.bashrc && \
+    echo 'export PATH="/root/.local/bin:$PATH"' >> /root/.profile && \
     cd /root && \
     git clone --depth 1 ${REPO_URL} && \
     cd hyperliquid-btc-lag-tracker- && \
