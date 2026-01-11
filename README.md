@@ -13,7 +13,7 @@
 - 🌐 **国际化支持**: UTF-8 Locale 支持 (en_US.UTF-8, zh_CN.UTF-8)
 - 🏗️ **多架构支持**: 支持 amd64 和 arm64 架构
 - 🤖 **自动构建**: GitHub Actions 自动构建和发布
-- 📊 **预置项目**: 内置 hyperliquid-btc-lag-tracker 项目，每2小时自动执行分析任务
+- 📊 **预置项目**: 内置 hyperliquid-pair-hype-purr-analyze 项目，每2小时自动执行分析任务
 
 ## 快速开始
 
@@ -71,27 +71,27 @@ ssh -p 2222 root@localhost
 
 ## 预置项目
 
-### Hyperliquid BTC Lag Tracker
+### Hyperliquid Pair Hype Purr Analyze
 
-镜像已内置 [hyperliquid-btc-lag-tracker](https://github.com/zhajingwen/hyperliquid-btc-lag-tracker-) 项目，位于 `/root/hyperliquid-btc-lag-tracker-` 目录。
+镜像已内置 [hyperliquid-pair-hype-purr-analyze](https://github.com/zhajingwen/hyperliquid-pair-hype-purr-analyze) 项目，位于 `/root/hyperliquid-pair-hype-purr-analyze` 目录。
 
 **自动任务**:
 - 每2小时自动执行分析脚本
-- 分析日志保存在 `/root/hyperliquid-btc-lag-tracker-/hyperliquid.log`
+- 分析日志保存在 `/root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log`
 - 环境变量 `LARKBOT_ID` 已配置为 `e15eaffe-05db-48f2-8059-a78b1beff8c9`
 
 **查看日志**:
 ```bash
 # 连接到容器后查看日志
-tail -f /root/hyperliquid-btc-lag-tracker-/hyperliquid.log
+tail -f /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log
 
 # 或使用 docker exec
-docker exec -it akash-ssh tail -f /root/hyperliquid-btc-lag-tracker-/hyperliquid.log
+docker exec -it akash-ssh tail -f /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log
 ```
 
 **手动运行**:
 ```bash
-cd /root/hyperliquid-btc-lag-tracker-
+cd /root/hyperliquid-pair-hype-purr-analyze
 uv run hyperliquid_analyzer.py
 ```
 
@@ -361,7 +361,7 @@ Dockerfile 支持以下构建参数（ARG）：
 | 参数 | 描述 | 默认值 |
 |------|------|--------|
 | `LARKBOT_ID` | Lark Bot ID | `""` (空，使用默认值) |
-| `REPO_URL` | hyperliquid 项目仓库地址 | `https://github.com/zhajingwen/hyperliquid-btc-lag-tracker-.git` |
+| `REPO_URL` | hyperliquid 项目仓库地址 | `https://github.com/zhajingwen/hyperliquid-pair-hype-purr-analyze.git` |
 | `CRON_SCHEDULE` | Cron 定时任务时间表 | `0 */2 * * *` (每2小时) |
 
 **使用示例**：
@@ -376,7 +376,7 @@ docker build \
 
 ### v1.0.0 (最新)
 
-- ✅ 集成 hyperliquid-btc-lag-tracker 项目
+- ✅ 集成 hyperliquid-pair-hype-purr-analyze 项目
 - ✅ 配置自动化定时任务（每2小时执行）
 - ✅ 优化镜像大小（删除 .git，使用浅克隆，节省 ~20MB）
 - ✅ 添加健康检查支持

@@ -2,12 +2,12 @@ FROM ghcr.io/akash-network/ubuntu-2404-ssh:2
 
 # 构建参数
 ARG LARKBOT_ID="e15eaffe-05db-48f2-8059-a78b1beff8c9"
-ARG REPO_URL="https://github.com/zhajingwen/hyperliquid-btc-lag-tracker-.git"
+ARG REPO_URL="https://github.com/zhajingwen/hyperliquid-pair-hype-purr-analyze.git"
 ARG CRON_SCHEDULE="0 */2 * * *"
 
 # 元数据标签
 LABEL maintainer="your-email@example.com" \
-      description="Ubuntu SSH with cron, uv, and hyperliquid-btc-lag-tracker" \
+      description="Ubuntu SSH with cron, uv, and hyperliquid-pair-hype-purr-analyze" \
       version="1.0.0"
 
 # 设置环境变量
@@ -41,16 +41,16 @@ RUN apt-get update && \
     echo 'export PATH="/root/.local/bin:$PATH"' >> /root/.profile && \
     cd /root && \
     git clone --depth 1 ${REPO_URL} && \
-    cd hyperliquid-btc-lag-tracker- && \
+    cd hyperliquid-pair-hype-purr-analyze && \
     /root/.local/bin/uv sync && \
     rm -rf .git && \
     mkdir -p /etc/cron.d && \
     echo "LARKBOT_ID=\${LARKBOT_ID}" > /root/crontab.txt && \
-    echo "${CRON_SCHEDULE} cd /root/hyperliquid-btc-lag-tracker- && /root/.local/bin/uv run hyperliquid_analyzer.py >> /root/hyperliquid-btc-lag-tracker-/hyperliquid.log 2>&1" >> /root/crontab.txt && \
+    echo "${CRON_SCHEDULE} cd /root/hyperliquid-pair-hype-purr-analyze && /root/.local/bin/uv run multi_coins3.py >> /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log 2>&1" >> /root/crontab.txt && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache
 
-WORKDIR /root/hyperliquid-btc-lag-tracker-
+WORKDIR /root/hyperliquid-pair-hype-purr-analyze
 
 # 【优化5】合并 COPY 和 chmod（减少1层）
 RUN mv /usr/local/bin/init.sh /usr/local/bin/init.sh.original
