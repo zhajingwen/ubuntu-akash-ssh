@@ -31,11 +31,11 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
+            type=sha,prefix={{branch}}-
             type=ref,event=pr,enable={{is_default_branch}}
             type=semver,pattern={{version}},enable={{is_default_branch}}
             type=semver,pattern={{major}}.{{minor}},enable={{is_default_branch}}
             type=semver,pattern={{major}},enable={{is_default_branch}}
-            type=sha,prefix={{branch}}-,enable={{is_default_branch}}
             type=raw,value=latest,enable={{is_default_branch}}
       
       - name: Log in to GitHub Container Registry
