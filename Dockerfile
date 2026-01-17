@@ -46,7 +46,7 @@ RUN apt-get update && \
     rm -rf .git && \
     mkdir -p /etc/cron.d && \
     echo "LARKBOT_ID=\${LARKBOT_ID}" > /root/crontab.txt && \
-    echo "${CRON_SCHEDULE} cd /root/hyperliquid-pair-hype-purr-analyze && /root/.local/bin/uv run multi_coins3.py >> /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log 2>&1" >> /root/crontab.txt && \
+    echo "${CRON_SCHEDULE} cd /root/hyperliquid-pair-hype-purr-analyze && /root/.local/bin/uv run multi_coins.py >> /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log 2>&1" >> /root/crontab.txt && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache
 
