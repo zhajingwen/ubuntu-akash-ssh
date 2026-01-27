@@ -20,7 +20,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # 【优化1】合并所有系统包安装和工具安装为一层（减少层数）
 # 【优化2】使用 --depth 1 浅克隆（减少下载大小）
-# 【优化3】删除 .git 目录（减少镜像大小 10-20MB）
+# 【优化3】保留 .git 目录（支持后续使用 git 命令）
 # 【优化4】清理所有缓存和临时文件（减少镜像大小）
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -43,7 +43,6 @@ RUN apt-get update && \
     git clone --depth 1 ${REPO_URL} && \
     cd hyperliquid-pair-hype-purr-analyze && \
     /root/.local/bin/uv sync && \
-    rm -rf .git && \
     mkdir -p /etc/cron.d && \
     echo "LARKBOT_ID=\${LARKBOT_ID}" > /root/crontab.txt && \
     echo "${CRON_SCHEDULE} cd /root/hyperliquid-pair-hype-purr-analyze && /root/.local/bin/uv run multi_coins.py >> /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log 2>&1" >> /root/crontab.txt && \
