@@ -45,7 +45,7 @@ RUN apt-get update && \
     /root/.local/bin/uv sync && \
     mkdir -p /etc/cron.d && \
     echo "LARKBOT_ID=\${LARKBOT_ID}" > /root/crontab.txt && \
-    echo "${CRON_SCHEDULE} cd /root/hyperliquid-pair-hype-purr-analyze && /root/.local/bin/uv run multi_coins.py >> /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log 2>&1" >> /root/crontab.txt && \
+    echo "${CRON_SCHEDULE} cd /root/hyperliquid-pair-hype-purr-analyze && /root/.local/bin/uv run realtime_kline_service.py >> /root/hyperliquid-pair-hype-purr-analyze/realtime_kline_service.log 2>&1" >> /root/crontab.txt && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache
 
