@@ -50,6 +50,9 @@ WORKDIR /root/hyperliquid-pair-coins-realtime-analyze
 RUN mv /usr/local/bin/init.sh /usr/local/bin/init.sh.original
 COPY --chmod=755 init.sh /usr/local/bin/init.sh
 
+# 复制监控脚本
+COPY --chmod=755 app_monitor.py /root/app_monitor.py
+
 # 【优化6】添加健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD service ssh status || exit 1
@@ -57,4 +60,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # 继承基础镜像的配置，并运行应用
 ENTRYPOINT ["/tini", "--", "/usr/local/bin/init.sh"]
 # CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze && uv run python -m src.services.realtime_kline_service_hype"]
-CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze && mkdir logs"]
+CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze && mkdir -p logs && /root/.local/bin/uv run python /root/app_monitor.py"]
