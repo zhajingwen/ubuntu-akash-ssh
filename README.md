@@ -1,19 +1,19 @@
 # Ubuntu Akash SSH
 
-基于 [Akash Network](https://github.com/akash-network) 的 Ubuntu SSH 镜像 (`ghcr.io/akash-network/ubuntu-2404-ssh:2`) 增强版本，集成了开发常用工具和 Cron 任务调度功能。
+基于 [Akash Network](https://github.com/akash-network) 的 Ubuntu SSH 镜像 (`ghcr.io/akash-network/ubuntu-2404-ssh:2`) 增强版本，集成了开发常用工具和实时分析服务。
 
 ## 特性
 
 - ✅ **基础镜像**: 基于 `ghcr.io/akash-network/ubuntu-2404-ssh:2` (Ubuntu 24.04)
 - 🔧 **开发工具**: 预装 vim、git、curl
-- ⏰ **任务调度**: 内置 cron 服务支持
+- ⏰ **自动运行**: 容器启动后自动运行分析服务
 - 📦 **Python 工具**: 集成 [uv](https://github.com/astral-sh/uv) 快速 Python 包管理器
 - 🔐 **SSH 访问**: 支持通过环境变量配置 SSH 公钥
 - 🌏 **时区配置**: 默认时区 Asia/Bangkok (可自定义)
 - 🌐 **国际化支持**: UTF-8 Locale 支持 (en_US.UTF-8, zh_CN.UTF-8)
 - 🏗️ **多架构支持**: 支持 amd64 和 arm64 架构
 - 🤖 **自动构建**: GitHub Actions 自动构建和发布
-- 📊 **预置项目**: 内置 hyperliquid-pair-hype-purr-analyze 项目，每2小时自动执行分析任务
+- 📊 **预置项目**: 内置 hyperliquid-pair-coins-realtime-analyze 项目，容器启动时自动运行实时分析服务
 
 ## 快速开始
 
@@ -62,7 +62,6 @@ ssh -p 2222 root@localhost
 ## 预装工具
 
 - **vim-tiny**: 轻量级文本编辑器
-- **cron**: 任务调度服务
 - **git**: 版本控制工具
 - **curl**: 数据传输工具
 - **ca-certificates**: SSL 证书
@@ -71,43 +70,24 @@ ssh -p 2222 root@localhost
 
 ## 预置项目
 
-### Hyperliquid Pair Hype Purr Analyze
+### Hyperliquid Pair Coins Realtime Analyze
 
-镜像已内置 [hyperliquid-pair-hype-purr-analyze](https://github.com/zhajingwen/hyperliquid-pair-hype-purr-analyze) 项目，位于 `/root/hyperliquid-pair-hype-purr-analyze` 目录。
+镜像已内置 [hyperliquid-pair-coins-realtime-analyze](https://github.com/zhajingwen/hyperliquid-pair-coins-realtime-analyze) 项目，位于 `/root/hyperliquid-pair-coins-realtime-analyze` 目录。
 
-**自动任务**:
-- 每2小时自动执行分析脚本
-- 分析日志保存在 `/root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log`
+**运行方式**:
+- 容器启动时自动执行命令：`uv run python -m src.services.realtime_kline_service_hype`
 - 环境变量 `LARKBOT_ID` 已配置为 `e15eaffe-05db-48f2-8059-a78b1beff8c9`
 
-**查看日志**:
+**查看容器日志**:
 ```bash
-# 连接到容器后查看日志
-tail -f /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log
+# 查看容器输出日志
+docker logs -f akash-ssh
 
-# 或使用 docker exec
-docker exec -it akash-ssh tail -f /root/hyperliquid-pair-hype-purr-analyze/hyperliquid.log
-```
-
-**手动运行**:
-```bash
-cd /root/hyperliquid-pair-hype-purr-analyze
-uv run hyperliquid_analyzer.py
+# 或连接到容器查看
+docker exec -it akash-ssh bash
 ```
 
 ## 使用示例
-
-### 配置 Cron 任务
-
-容器启动后，cron 服务会自动运行。您可以添加定时任务：
-
-```bash
-# 编辑 crontab
-crontab -e
-
-# 示例: 每小时执行一次任务
-0 * * * * /path/to/your/script.sh
-```
 
 ### 使用 uv 管理 Python 包
 
@@ -146,7 +126,6 @@ docker build -t ubuntu-akash-ssh:local .
 # 使用自定义参数构建
 docker build \
   --build-arg LARKBOT_ID="your-larkbot-id" \
-  --build-arg CRON_SCHEDULE="0 */1 * * *" \
   -t ubuntu-akash-ssh:local .
 
 # 运行
@@ -165,7 +144,7 @@ docker run -d -p 2222:22 -e SSH_PUBKEY="$(cat ~/.ssh/id_rsa.pub)" ubuntu-akash-s
 ./test-build.sh --clean
 
 # 使用自定义参数测试
-./test-build.sh --build-arg CRON_SCHEDULE="0 */1 * * *"
+./test-build.sh --build-arg LARKBOT_ID="your-larkbot-id"
 ```
 
 ### 多架构构建
@@ -259,7 +238,7 @@ akash tx deployment create deploy.yaml --from <your-wallet-name>
 ```
 .
 ├── Dockerfile              # 镜像构建文件
-├── init.sh                # 容器初始化脚本 (增强版，支持 crontab 自动加载)
+├── init.sh                # 容器初始化脚本（配置 SSH 访问）
 ├── .dockerignore          # Docker 构建忽略文件
 ├── .gitignore             # Git 忽略文件
 ├── CHANGELOG.md           # 更新日志
@@ -274,13 +253,11 @@ akash tx deployment create deploy.yaml --from <your-wallet-name>
 
 ### 初始化流程
 
-容器启动时，`init.sh` 脚本会执行以下操作：
+容器启动时会执行以下操作：
 
-1. 检查并配置 SSH 公钥 (从 `SSH_PUBKEY` 环境变量)
-2. 加载 crontab 配置
-3. 启动 cron 服务
-4. 启动 SSH 服务
-5. 保持容器运行
+1. 配置 SSH 公钥（从 `SSH_PUBKEY` 环境变量）
+2. 启动 SSH 服务
+3. 运行实时分析服务：`uv run python -m src.services.realtime_kline_service_hype`
 
 ### 镜像优化
 
@@ -312,12 +289,12 @@ A: 通过环境变量 `TZ` 设置：
 docker run -d -e TZ=Asia/Shanghai -e SSH_PUBKEY="..." ghcr.io/zhajingwen/ubuntu-akash-ssh:latest
 ```
 
-### Q: Cron 任务没有执行？
+### Q: 如何查看应用运行状态？
 
-A: 检查 cron 服务状态：
+A: 查看容器日志：
 
 ```bash
-docker exec -it akash-ssh service cron status
+docker logs -f akash-ssh
 ```
 
 ### Q: 如何查看容器日志？
@@ -360,15 +337,13 @@ Dockerfile 支持以下构建参数（ARG）：
 
 | 参数 | 描述 | 默认值 |
 |------|------|--------|
-| `LARKBOT_ID` | Lark Bot ID | `""` (空，使用默认值) |
-| `REPO_URL` | hyperliquid 项目仓库地址 | `https://github.com/zhajingwen/hyperliquid-pair-hype-purr-analyze.git` |
-| `CRON_SCHEDULE` | Cron 定时任务时间表 | `0 */2 * * *` (每2小时) |
+| `LARKBOT_ID` | Lark Bot ID | `e15eaffe-05db-48f2-8059-a78b1beff8c9` |
+| `REPO_URL` | hyperliquid 项目仓库地址 | `https://github.com/zhajingwen/hyperliquid-pair-coins-realtime-analyze.git` |
 
 **使用示例**：
 ```bash
 docker build \
   --build-arg LARKBOT_ID="custom-id" \
-  --build-arg CRON_SCHEDULE="0 */1 * * *" \
   -t ubuntu-akash-ssh:custom .
 ```
 
@@ -376,12 +351,12 @@ docker build \
 
 ### v1.0.0 (最新)
 
-- ✅ 集成 hyperliquid-pair-hype-purr-analyze 项目
-- ✅ 配置自动化定时任务（每2小时执行）
-- ✅ 优化镜像大小（删除 .git，使用浅克隆，节省 ~20MB）
+- ✅ 集成 hyperliquid-pair-coins-realtime-analyze 项目
+- ✅ 容器启动时自动运行实时分析服务
+- ✅ 优化镜像大小（使用浅克隆，移除不必要的依赖）
 - ✅ 添加健康检查支持
-- ✅ 支持参数化构建（LARKBOT_ID、CRON_SCHEDULE 等）
-- ✅ 优化 Dockerfile 层数（5层 → 3层）
-- ✅ 集成 vim、cron、git、curl、UV 工具
+- ✅ 支持参数化构建（LARKBOT_ID、REPO_URL 等）
+- ✅ 优化 Dockerfile 层数
+- ✅ 集成 vim、git、curl、UV 工具
 - ✅ 配置自动化 CI/CD 流程
 - ✅ 支持多架构构建 (amd64/arm64)

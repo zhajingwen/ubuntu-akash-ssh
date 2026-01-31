@@ -2,12 +2,11 @@ FROM ghcr.io/akash-network/ubuntu-2404-ssh:2
 
 # 构建参数
 ARG LARKBOT_ID="e15eaffe-05db-48f2-8059-a78b1beff8c9"
-ARG REPO_URL="https://github.com/zhajingwen/hyperliquid-pair-hype-purr-analyze.git"
-ARG CRON_SCHEDULE="0 */2 * * *"
+ARG REPO_URL="https://github.com/zhajingwen/hyperliquid-pair-coins-realtime-analyze.git"
 
 # 元数据标签
 LABEL maintainer="your-email@example.com" \
-      description="Ubuntu SSH with cron, uv, and hyperliquid-pair-hype-purr-analyze" \
+      description="Ubuntu SSH with uv and hyperliquid-pair-coins-realtime-analyze" \
       version="1.0.0"
 
 # 设置环境变量
@@ -25,7 +24,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         vim-tiny \
-        cron \
         tzdata \
         git \
         curl \
@@ -41,15 +39,12 @@ RUN apt-get update && \
     echo 'export PATH="/root/.local/bin:$PATH"' >> /root/.profile && \
     cd /root && \
     git clone --depth 1 ${REPO_URL} && \
-    cd hyperliquid-pair-hype-purr-analyze && \
+    cd hyperliquid-pair-coins-realtime-analyze && \
     /root/.local/bin/uv sync && \
-    mkdir -p /etc/cron.d && \
-    echo "LARKBOT_ID=\${LARKBOT_ID}" > /root/crontab.txt && \
-    echo "${CRON_SCHEDULE} cd /root/hyperliquid-pair-hype-purr-analyze && /root/.local/bin/uv run realtime_kline_service.py >> /root/hyperliquid-pair-hype-purr-analyze/realtime_kline_service.log 2>&1" >> /root/crontab.txt && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache
 
-WORKDIR /root/hyperliquid-pair-hype-purr-analyze
+WORKDIR /root/hyperliquid-pair-coins-realtime-analyze
 
 # 【优化5】合并 COPY 和 chmod（减少1层）
 RUN mv /usr/local/bin/init.sh /usr/local/bin/init.sh.original
@@ -57,8 +52,8 @@ COPY --chmod=755 init.sh /usr/local/bin/init.sh
 
 # 【优化6】添加健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD service cron status && service ssh status || exit 1
+    CMD service ssh status || exit 1
 
-# 继承基础镜像的配置
+# 继承基础镜像的配置，并运行应用
 # ENTRYPOINT ["/tini", "--", "/usr/local/bin/init.sh"]
-# CMD ["tail", "-f", "/dev/null"]
+CMD ["/bin/bash", "-c", "/usr/sbin/sshd && cd /root/hyperliquid-pair-coins-realtime-analyze && uv run python -m src.services.realtime_kline_service_hype"]
