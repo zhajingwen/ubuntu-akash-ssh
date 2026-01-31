@@ -57,4 +57,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # 继承基础镜像的配置，并运行应用
 ENTRYPOINT ["/tini", "--", "/usr/local/bin/init.sh"]
 # CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze && uv run python -m src.services.realtime_kline_service_hype"]
-CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze"]
+CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze && mkdir logs"]
