@@ -55,5 +55,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD service ssh status || exit 1
 
 # 继承基础镜像的配置，并运行应用
-# ENTRYPOINT ["/tini", "--", "/usr/local/bin/init.sh"]
-CMD ["/bin/bash", "-c", "/usr/sbin/sshd && cd /root/hyperliquid-pair-coins-realtime-analyze && uv run python -m src.services.realtime_kline_service_hype"]
+ENTRYPOINT ["/tini", "--", "/usr/local/bin/init.sh"]
+CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze && uv run python -m src.services.realtime_kline_service_hype"]
