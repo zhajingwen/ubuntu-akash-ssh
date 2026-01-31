@@ -15,7 +15,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/root/.local/bin:${PATH}" \
     LARKBOT_ID="${LARKBOT_ID}" \
     LANG=C.UTF-8 \
-    LC_ALL=C.UTF-8
+    LC_ALL=C.UTF-8 \
+    PYTHONUNBUFFERED=1
 
 # 【优化1】合并所有系统包安装和工具安装为一层（减少层数）
 # 【优化2】使用 --depth 1 浅克隆（减少下载大小）
