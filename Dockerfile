@@ -42,6 +42,7 @@ RUN apt-get update && \
     git clone --depth 1 ${REPO_URL} && \
     cd hyperliquid-pair-coins-realtime-analyze && \
     /root/.local/bin/uv sync && \
+    mkdir -p logs && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache
 
@@ -61,4 +62,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # 继承基础镜像的配置，并运行应用
 ENTRYPOINT ["/tini", "--", "/usr/local/bin/init.sh"]
 # CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze && uv run python -m src.services.realtime_kline_service_hype"]
-CMD ["/bin/bash", "-c", "cd /root/hyperliquid-pair-coins-realtime-analyze && mkdir -p logs && /root/.local/bin/uv run python /root/app_monitor.py"]
+CMD ["uv", "run", "python", "/root/app_monitor.py", "-i", "3600"]
