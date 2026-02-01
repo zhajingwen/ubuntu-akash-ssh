@@ -39,7 +39,7 @@ RUN apt-get update && \
     echo 'export PATH="/root/.local/bin:$PATH"' >> /root/.bashrc && \
     echo 'export PATH="/root/.local/bin:$PATH"' >> /root/.profile && \
     cd /root && \
-    git clone --depth 1 ${REPO_URL} && \
+    git clone --depth 1 -b realinsert ${REPO_URL} && \
     cd hyperliquid-pair-coins-realtime-analyze && \
     /root/.local/bin/uv sync && \
     mkdir -p logs && \
