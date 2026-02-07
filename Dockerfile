@@ -41,6 +41,7 @@ RUN apt-get update && \
     cd /root && \
     git clone --depth 1 -b realinsert ${REPO_URL} && \
     cd hyperliquid-pair-coins-realtime-analyze && \
+    git remote set-branches origin "*" && \
     /root/.local/bin/uv sync && \
     mkdir -p logs && \
     apt-get clean && \
